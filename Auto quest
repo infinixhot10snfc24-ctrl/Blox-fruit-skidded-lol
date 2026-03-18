@@ -114,6 +114,7 @@ end
 
 task.spawn(function()
     while task.wait(1) do
+     if getgenv().AutoQuest == true then
         pcall(AutoQuestLogic)
     end
 end)
