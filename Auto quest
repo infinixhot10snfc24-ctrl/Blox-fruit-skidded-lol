@@ -6,60 +6,96 @@ local plr = Players.LocalPlayer
 
 local QuestList = {
     ["Sea1"] = {
-        {Level = 0, QuestName = "BanditQuest1", MonName = "Bandit", NPCPos = CFrame.new(1059.3, 15.4, 1549.3), LevelQuest = 1},
-        {Level = 15, QuestName = "JungleQuest", MonName = "Monkey", NPCPos = CFrame.new(-1598.4, 35.5, 153.2), LevelQuest = 1},
-        {Level = 30, QuestName = "JungleQuest", MonName = "Gorilla", NPCPos = CFrame.new(-1598.4, 35.5, 153.2), LevelQuest = 2},
-        {Level = 35, QuestName = "BuggyQuest1", MonName = "Pirate", NPCPos = CFrame.new(-1141.1, 4.7, 3824.3), LevelQuest = 1},
-        {Level = 45, QuestName = "BuggyQuest1", MonName = "Brute", NPCPos = CFrame.new(-1141.1, 4.7, 3824.3), LevelQuest = 2},
-        {Level = 60, QuestName = "DesertQuest", MonName = "Desert Bandit", NPCPos = CFrame.new(894.4, 6.4, 4388.9), LevelQuest = 1},
-        {Level = 75, QuestName = "DesertQuest", MonName = "Desert Officer", NPCPos = CFrame.new(894.4, 6.4, 4388.9), LevelQuest = 2},
-        {Level = 90, QuestName = "SnowQuest", MonName = "Snow Bandit", NPCPos = CFrame.new(1389.7, 14.9, -1298.4), LevelQuest = 1},
-        {Level = 105, QuestName = "SnowQuest", MonName = "Snowman", NPCPos = CFrame.new(1389.7, 14.9, -1298.4), LevelQuest = 2},
-        {Level = 120, QuestName = "MarineQuest", MonName = "Chief Petty Officer", NPCPos = CFrame.new(-4855.2, 22.6, 4323.7), LevelQuest = 1},
-        {Level = 150, QuestName = "SkyQuest", MonName = "Sky Bandit", NPCPos = CFrame.new(-1148.8, 417, -2719.9), LevelQuest = 1},
-        {Level = 175, QuestName = "SkyQuest", MonName = "Dark Master", NPCPos = CFrame.new(-1148.8, 417, -2719.9), LevelQuest = 2},
-        {Level = 190, QuestName = "PrisonQuest", MonName = "Warden", NPCPos = CFrame.new(5308.2, 0.1, 474.3), LevelQuest = 1},
-        {Level = 210, QuestName = "PrisonQuest", MonName = "Chief Warden", NPCPos = CFrame.new(5308.2, 0.1, 474.3), LevelQuest = 2},
-        {Level = 250, QuestName = "ColosseumQuest", MonName = "Toga Warrior", NPCPos = CFrame.new(-1580, 7, -2980), LevelQuest = 1},
-        {Level = 300, QuestName = "MagmaQuest", MonName = "Military Soldier", NPCPos = CFrame.new(-5315.6, 12.2, 8516.7), LevelQuest = 1},
-        {Level = 325, QuestName = "MagmaQuest", MonName = "Military Spy", NPCPos = CFrame.new(-5315.6, 12.2, 8516.7), LevelQuest = 2},
-        {Level = 375, QuestName = "FishmanQuest", MonName = "Fishman Warrior", NPCPos = CFrame.new(61122.5, 18.4, 1568.1), LevelQuest = 1},
-        {Level = 400, QuestName = "FishmanQuest", MonName = "Fishman Commando", NPCPos = CFrame.new(61122.5, 18.4, 1568.1), LevelQuest = 2},
-        {Level = 450, QuestName = "UpperQuest1", MonName = "God's Guard", NPCPos = CFrame.new(-7859.4, 5544.1, -381.5), LevelQuest = 1},
-        {Level = 475, QuestName = "UpperQuest1", MonName = "Shanda", NPCPos = CFrame.new(-7859.4, 5544.1, -381.5), LevelQuest = 2},
-        {Level = 525, QuestName = "UpperQuest2", MonName = "Royal Guard", NPCPos = CFrame.new(-470, 850, -1950), LevelQuest = 1},
-        {Level = 625, QuestName = "FountainQuest", MonName = "Galley Pirate", NPCPos = CFrame.new(5259.5, 38.5, 4050.1), LevelQuest = 1},
-        {Level = 650, QuestName = "FountainQuest", MonName = "Galley Captain", NPCPos = CFrame.new(5259.5, 38.5, 4050.1), LevelQuest = 2}
+        {Level = 0, QuestName = "BanditQuest1", MonName = "Bandit", NPCPos = CFrame.new(1060, 16, 1547), LevelQuest = 1},
+        {Level = 10, QuestName = "JungleQuest", MonName = "Monkey", NPCPos = CFrame.new(-1601, 36, 153), LevelQuest = 1},
+        {Level = 15, QuestName = "JungleQuest", MonName = "Gorilla", NPCPos = CFrame.new(-1601, 36, 153), LevelQuest = 2},
+        {Level = 30, QuestName = "BuggyQuest1", MonName = "Pirate", NPCPos = CFrame.new(-1140, 4, 3827), LevelQuest = 1},
+        {Level = 40, QuestName = "BuggyQuest1", MonName = "Brute", NPCPos = CFrame.new(-1140, 4, 3827), LevelQuest = 2},
+        {Level = 60, QuestName = "DesertQuest", MonName = "Desert Bandit", NPCPos = CFrame.new(896, 6, 4390), LevelQuest = 1},
+        {Level = 75, QuestName = "DesertQuest", MonName = "Desert Officer", NPCPos = CFrame.new(896, 6, 4390), LevelQuest = 2},
+        {Level = 90, QuestName = "SnowQuest", MonName = "Snow Bandit", NPCPos = CFrame.new(1386, 87, -1298), LevelQuest = 1},
+        {Level = 100, QuestName = "SnowQuest", MonName = "Snowman", NPCPos = CFrame.new(1386, 87, -1298), LevelQuest = 2},
+        {Level = 120, QuestName = "MarineQuest2", MonName = "Chief Petty Officer", NPCPos = CFrame.new(-5035, 28, 4324), LevelQuest = 1},
+        {Level = 150, QuestName = "SkyQuest", MonName = "Sky Bandit", NPCPos = CFrame.new(-4842, 717, -2623), LevelQuest = 1},
+        {Level = 175, QuestName = "SkyQuest", MonName = "Dark Master", NPCPos = CFrame.new(-4842, 717, -2623), LevelQuest = 2},
+        {Level = 190, QuestName = "PrisonerQuest", MonName = "Prisoner", NPCPos = CFrame.new(5310, 0, 474), LevelQuest = 1},
+        {Level = 210, QuestName = "PrisonerQuest", MonName = "Dangerous Prisoner", NPCPos = CFrame.new(5310, 0, 474), LevelQuest = 2},
+        {Level = 250, QuestName = "ColosseumQuest", MonName = "Toga Warrior", NPCPos = CFrame.new(-1577, 7, -2984), LevelQuest = 1},
+        {Level = 275, QuestName = "ColosseumQuest", MonName = "Gladiator", NPCPos = CFrame.new(-1577, 7, -2984), LevelQuest = 2},
+        {Level = 300, QuestName = "MagmaQuest", MonName = "Military Soldier", NPCPos = CFrame.new(-5316, 12, 8517), LevelQuest = 1},
+        {Level = 325, QuestName = "MagmaQuest", MonName = "Military Spy", NPCPos = CFrame.new(-5316, 12, 8517), LevelQuest = 2},
+        {Level = 375, QuestName = "FishmanQuest", MonName = "Fishman Warrior", NPCPos = CFrame.new(61122, 18, 1569), LevelQuest = 1},
+        {Level = 400, QuestName = "FishmanQuest", MonName = "Fishman Commando", NPCPos = CFrame.new(61122, 18, 1569), LevelQuest = 2},
+        {Level = 450, QuestName = "SkyExp1Quest", MonName = "God's Guard", NPCPos = CFrame.new(-4721, 845, -1953), LevelQuest = 1},
+        {Level = 475, QuestName = "SkyExp1Quest", MonName = "Shanda", NPCPos = CFrame.new(-7863, 5545, -378), LevelQuest = 2},
+        {Level = 525, QuestName = "SkyExp2Quest", MonName = "Royal Squad", NPCPos = CFrame.new(-7903, 5635, -1410), LevelQuest = 1},
+        {Level = 550, QuestName = "SkyExp2Quest", MonName = "Royal Soldier", NPCPos = CFrame.new(-7903, 5635, -1410), LevelQuest = 2},
+        {Level = 625, QuestName = "FountainQuest", MonName = "Galley Pirate", NPCPos = CFrame.new(5258, 38, 4050), LevelQuest = 1},
+        {Level = 650, QuestName = "FountainQuest", MonName = "Galley Captain", NPCPos = CFrame.new(5258, 38, 4050), LevelQuest = 2}
     },
     ["Sea2"] = {
-        {Level = 700, QuestName = "Area1Quest", MonName = "Raider", NPCPos = CFrame.new(-424, 7, 1836), LevelQuest = 1},
-        {Level = 725, QuestName = "Area1Quest", MonName = "Mercenary", NPCPos = CFrame.new(-424, 7, 1836), LevelQuest = 2},
-        {Level = 775, QuestName = "Area2Quest", MonName = "Swan Pirate", NPCPos = CFrame.new(634, 25, 395), LevelQuest = 1},
-        {Level = 875, QuestName = "MarineQuest2", MonName = "Marine Lieutenant", NPCPos = CFrame.new(-2440, 73, -3219), LevelQuest = 1},
-        {Level = 900, QuestName = "MarineQuest2", MonName = "Marine Captain", NPCPos = CFrame.new(-2440, 73, -3219), LevelQuest = 2},
-        {Level = 950, QuestName = "ZombieQuest", MonName = "Zombie", NPCPos = CFrame.new(-5497, 48, -795), LevelQuest = 1},
-        {Level = 975, QuestName = "ZombieQuest", MonName = "Vampire", NPCPos = CFrame.new(-5497, 48, -795), LevelQuest = 2},
-        {Level = 1000, QuestName = "SnowMountainQuest", MonName = "Snow Trooper", NPCPos = CFrame.new(609, 401, -5371), LevelQuest = 1},
-        {Level = 1050, QuestName = "SnowMountainQuest", MonName = "Winter Warrior", NPCPos = CFrame.new(609, 401, -5371), LevelQuest = 2},
-        {Level = 1100, QuestName = "IceSideQuest", MonName = "Lab Subordinate", NPCPos = CFrame.new(-6064, 16, -4905), LevelQuest = 1},
-        {Level = 1125, QuestName = "IceSideQuest", MonName = "Horned Turtle", NPCPos = CFrame.new(-6064, 16, -4905), LevelQuest = 2},
-        {Level = 1175, QuestName = "FireSideQuest", MonName = "Magma Ninja", NPCPos = CFrame.new(-5430, 15, -5295), LevelQuest = 1},
-        {Level = 1200, QuestName = "FireSideQuest", MonName = "Lava Pirate", NPCPos = CFrame.new(-5430, 15, -5295), LevelQuest = 2},
-        {Level = 1250, QuestName = "ShipQuest1", MonName = "Ship Deckhand", NPCPos = CFrame.new(1037, 125, 32911), LevelQuest = 1},
-        {Level = 1275, QuestName = "ShipQuest1", MonName = "Ship Engineer", NPCPos = CFrame.new(1037, 125, 32911), LevelQuest = 2},
-        {Level = 1350, QuestName = "IceCastleQuest", MonName = "Arctic Warrior", NPCPos = CFrame.new(6061, 28, -6253), LevelQuest = 1},
-        {Level = 1425, QuestName = "ForgottenQuest", MonName = "Sea Soldier", NPCPos = CFrame.new(-3050, 7, -10145), LevelQuest = 1}
+        {Level = 700, QuestName = "Area1Quest", MonName = "Raider", NPCPos = CFrame.new(-427, 72, 1835), LevelQuest = 1},
+        {Level = 725, QuestName = "Area1Quest", MonName = "Mercenary", NPCPos = CFrame.new(-427, 72, 1835), LevelQuest = 2},
+        {Level = 775, QuestName = "Area2Quest", MonName = "Swan Pirate", NPCPos = CFrame.new(635, 73, 917), LevelQuest = 1},
+        {Level = 800, QuestName = "Area2Quest", MonName = "Factory Staff", NPCPos = CFrame.new(635, 73, 917), LevelQuest = 2},
+        {Level = 875, QuestName = "MarineQuest3", MonName = "Marine Lieutenant", NPCPos = CFrame.new(-2440, 73, -3217), LevelQuest = 1},
+        {Level = 900, QuestName = "MarineQuest3", MonName = "Marine Captain", NPCPos = CFrame.new(-2440, 73, -3217), LevelQuest = 2},
+        {Level = 950, QuestName = "ZombieQuest", MonName = "Zombie", NPCPos = CFrame.new(-5494, 48, -794), LevelQuest = 1},
+        {Level = 975, QuestName = "ZombieQuest", MonName = "Vampire", NPCPos = CFrame.new(-5494, 48, -794), LevelQuest = 2},
+        {Level = 1000, QuestName = "SnowMountainQuest", MonName = "Snow Trooper", NPCPos = CFrame.new(607, 401, -5370), LevelQuest = 1},
+        {Level = 1050, QuestName = "SnowMountainQuest", MonName = "Winter Warrior", NPCPos = CFrame.new(607, 401, -5370), LevelQuest = 2},
+        {Level = 1100, QuestName = "IceSideQuest", MonName = "Lab Subordinate", NPCPos = CFrame.new(-6061, 15, -4902), LevelQuest = 1},
+        {Level = 1125, QuestName = "IceSideQuest", MonName = "Horned Warrior", NPCPos = CFrame.new(-6061, 15, -4902), LevelQuest = 2},
+        {Level = 1175, QuestName = "FireSideQuest", MonName = "Magma Ninja", NPCPos = CFrame.new(-5429, 15, -5297), LevelQuest = 1},
+        {Level = 1200, QuestName = "FireSideQuest", MonName = "Lava Pirate", NPCPos = CFrame.new(-5429, 15, -5297), LevelQuest = 2},
+        {Level = 1250, QuestName = "ShipQuest1", MonName = "Ship Deckhand", NPCPos = CFrame.new(1040, 125, 32911), LevelQuest = 1},
+        {Level = 1275, QuestName = "ShipQuest1", MonName = "Ship Engineer", NPCPos = CFrame.new(1040, 125, 32911), LevelQuest = 2},
+        {Level = 1300, QuestName = "ShipQuest2", MonName = "Ship Steward", NPCPos = CFrame.new(971, 125, 33245), LevelQuest = 1},
+        {Level = 1325, QuestName = "ShipQuest2", MonName = "Ship Officer", NPCPos = CFrame.new(971, 125, 33245), LevelQuest = 2},
+        {Level = 1350, QuestName = "FrostQuest", MonName = "Arctic Warrior", NPCPos = CFrame.new(5668, 28, -6484), LevelQuest = 1},
+        {Level = 1375, QuestName = "FrostQuest", MonName = "Snow Lurker", NPCPos = CFrame.new(5668, 28, -6484), LevelQuest = 2},
+        {Level = 1425, QuestName = "ForgottenQuest", MonName = "Sea Soldier", NPCPos = CFrame.new(-3054, 236, -10147), LevelQuest = 1},
+        {Level = 1450, QuestName = "ForgottenQuest", MonName = "Water Fighter", NPCPos = CFrame.new(-3054, 236, -10147), LevelQuest = 2}
     },
     ["Sea3"] = {
-        {Level = 1500, QuestName = "PortTownQuest", MonName = "Pirate Millionaire", NPCPos = CFrame.new(-290, 7, 5328), LevelQuest = 1},
-        {Level = 1525, QuestName = "PortTownQuest", MonName = "Pistol Billionaire", NPCPos = CFrame.new(-290, 7, 5328), LevelQuest = 2},
-        {Level = 1575, QuestName = "HydraIslandQuest", MonName = "Dragon Crew Warrior", NPCPos = CFrame.new(5214, 141, 9), LevelQuest = 1},
-        {Level = 1600, QuestName = "HydraIslandQuest", MonName = "Dragon Crew Archer", NPCPos = CFrame.new(5214, 141, 9), LevelQuest = 2},
-        {Level = 1700, QuestName = "TurtleQuest", MonName = "Jungle Pirate", NPCPos = CFrame.new(-10582, 332, -10128), LevelQuest = 1},
-        {Level = 1775, QuestName = "TurtleQuest", MonName = "Fishman Raider", NPCPos = CFrame.new(-10582, 332, -10128), LevelQuest = 2},
-        {Level = 1900, QuestName = "HauntedQuest1", MonName = "Reborn Skeleton", NPCPos = CFrame.new(-9515, 164, 5786), LevelQuest = 1},
-        {Level = 2025, QuestName = "HauntedQuest2", MonName = "Demonic Soul", NPCPos = CFrame.new(-9515, 164, 5786), LevelQuest = 1},
-        {Level = 2100, QuestName = "IceCreamQuest", MonName = "Ice Cream Chef", NPCPos = CFrame.new(-901, 66, -12128), LevelQuest = 1}
+        {Level = 1500, QuestName = "PiratePortQuest", MonName = "Pirate Millionaire", NPCPos = CFrame.new(-450, 107, 5950), LevelQuest = 1},
+        {Level = 1525, QuestName = "PiratePortQuest", MonName = "Pistol Billionaire", NPCPos = CFrame.new(-450, 107, 5950), LevelQuest = 2},
+        {Level = 1575, QuestName = "DragonCrewQuest", MonName = "Dragon Crew Warrior", NPCPos = CFrame.new(6735, 126, -711), LevelQuest = 1},
+        {Level = 1600, QuestName = "DragonCrewQuest", MonName = "Dragon Crew Archer", NPCPos = CFrame.new(6735, 126, -711), LevelQuest = 2},
+        {Level = 1625, QuestName = "VenomCrewQuest", MonName = "Hydra Enforcer", NPCPos = CFrame.new(5446, 601, 749), LevelQuest = 1},
+        {Level = 1650, QuestName = "VenomCrewQuest", MonName = "Venomous Assailant", NPCPos = CFrame.new(5446, 601, 749), LevelQuest = 2},
+        {Level = 1700, QuestName = "MarineTreeIsland", MonName = "Marine Commodore", NPCPos = CFrame.new(2179, 28, -6740), LevelQuest = 1},
+        {Level = 1725, QuestName = "MarineTreeIsland", MonName = "Marine Rear Admiral", NPCPos = CFrame.new(2179, 28, -6740), LevelQuest = 2},
+        {Level = 1775, QuestName = "DeepForestIsland3", MonName = "Fishman Raider", NPCPos = CFrame.new(-10582, 331, -8757), LevelQuest = 1},
+        {Level = 1800, QuestName = "DeepForestIsland3", MonName = "Fishman Captain", NPCPos = CFrame.new(-10583, 331, -8759), LevelQuest = 2},
+        {Level = 1825, QuestName = "DeepForestIsland", MonName = "Forest Pirate", NPCPos = CFrame.new(-13232, 332, -7626), LevelQuest = 1},
+        {Level = 1850, QuestName = "DeepForestIsland", MonName = "Mythological Pirate", NPCPos = CFrame.new(-13232, 332, -7626), LevelQuest = 2},
+        {Level = 1900, QuestName = "DeepForestIsland2", MonName = "Jungle Pirate", NPCPos = CFrame.new(-12682, 390, -9902), LevelQuest = 1},
+        {Level = 1925, QuestName = "DeepForestIsland2", MonName = "Musketeer Pirate", NPCPos = CFrame.new(-12682, 390, -9902), LevelQuest = 2},
+        {Level = 1975, QuestName = "HauntedQuest1", MonName = "Reborn Skeleton", NPCPos = CFrame.new(-9480, 142, 5566), LevelQuest = 1},
+        {Level = 2000, QuestName = "HauntedQuest1", MonName = "Living Zombie", NPCPos = CFrame.new(-9480, 142, 5566), LevelQuest = 2},
+        {Level = 2025, QuestName = "HauntedQuest2", MonName = "Demonic Soul", NPCPos = CFrame.new(-9516, 178, 6078), LevelQuest = 1},
+        {Level = 2050, QuestName = "HauntedQuest2", MonName = "Posessed Mummy", NPCPos = CFrame.new(-9516, 178, 6078), LevelQuest = 2},
+        {Level = 2075, QuestName = "NutsIslandQuest", MonName = "Peanut Scout", NPCPos = CFrame.new(-2105, 37, -10195), LevelQuest = 1},
+        {Level = 2100, QuestName = "NutsIslandQuest", MonName = "Peanut President", NPCPos = CFrame.new(-2105, 37, -10195), LevelQuest = 2},
+        {Level = 2125, QuestName = "IceCreamIslandQuest", MonName = "Ice Cream Chef", NPCPos = CFrame.new(-819, 64, -10967), LevelQuest = 1},
+        {Level = 2150, QuestName = "IceCreamIslandQuest", MonName = "Ice Cream Commander", NPCPos = CFrame.new(-819, 64, -10967), LevelQuest = 2},
+        {Level = 2200, QuestName = "CakeQuest1", MonName = "Cookie Crafter", NPCPos = CFrame.new(-2022, 36, -12030), LevelQuest = 1},
+        {Level = 2225, QuestName = "CakeQuest1", MonName = "Cake Guard", NPCPos = CFrame.new(-2022, 36, -12030), LevelQuest = 2},
+        {Level = 2250, QuestName = "CakeQuest2", MonName = "Baking Staff", NPCPos = CFrame.new(-1928, 37, -12840), LevelQuest = 1},
+        {Level = 2275, QuestName = "CakeQuest2", MonName = "Head Baker", NPCPos = CFrame.new(-1928, 37, -12840), LevelQuest = 2},
+        {Level = 2300, QuestName = "ChocQuest1", MonName = "Cocoa Warrior", NPCPos = CFrame.new(231, 23, -12200), LevelQuest = 1},
+        {Level = 2325, QuestName = "ChocQuest1", MonName = "Chocolate Bar Battler", NPCPos = CFrame.new(231, 23, -12200), LevelQuest = 2},
+        {Level = 2350, QuestName = "ChocQuest2", MonName = "Sweet Thief", NPCPos = CFrame.new(151, 23, -12774), LevelQuest = 1},
+        {Level = 2375, QuestName = "ChocQuest2", MonName = "Candy Rebel", NPCPos = CFrame.new(151, 23, -12774), LevelQuest = 2},
+        {Level = 2400, QuestName = "CandyQuest1", MonName = "Candy Pirate", NPCPos = CFrame.new(-1149, 13, -14445), LevelQuest = 1},
+        {Level = 2425, QuestName = "CandyQuest1", MonName = "Snow Demon", NPCPos = CFrame.new(-1149, 13, -14445), LevelQuest = 2},
+        {Level = 2450, QuestName = "TikiQuest1", MonName = "Isle Outlaw", NPCPos = CFrame.new(-16549, 55, -179), LevelQuest = 1},
+        {Level = 2475, QuestName = "TikiQuest1", MonName = "Island Boy", NPCPos = CFrame.new(-16549, 55, -179), LevelQuest = 2},
+        {Level = 2500, QuestName = "TikiQuest2", MonName = "Sun-kissed Warrior", NPCPos = CFrame.new(-16541, 54, 1051), LevelQuest = 1},
+        {Level = 2525, QuestName = "TikiQuest2", MonName = "Isle Champion", NPCPos = CFrame.new(-16541, 54, 1051), LevelQuest = 2},
+        {Level = 2550, QuestName = "TikiQuest3", MonName = "Serpent Hunter", NPCPos = CFrame.new(-16665, 104, 1579), LevelQuest = 1},
+        {Level = 2575, QuestName = "TikiQuest3", MonName = "Skull Slayer", NPCPos = CFrame.new(-16665, 104, 1579), LevelQuest = 2}
     }
 }
 
@@ -89,17 +125,14 @@ end
 
 local function AutoQuestLogic()
     if CheckQuestActive() then return end
-    
     local MyLevel = plr.Data.Level.Value
     local Sea = GetCurrentSea()
     local BestQuest = nil
-    
     for _, v in ipairs(QuestList[Sea]) do
         if MyLevel >= v.Level then
             BestQuest = v
         end
     end
-    
     if BestQuest then
         local InitialPos = plr.Character.HumanoidRootPart.CFrame
         Tween(BestQuest.NPCPos)
@@ -114,7 +147,8 @@ end
 
 task.spawn(function()
     while task.wait(1) do
-     if getgenv().AutoQuest == true then
-        pcall(AutoQuestLogic)
+        if getgenv().AutoQuest == true then
+            pcall(AutoQuestLogic)
+        end
     end
 end)
