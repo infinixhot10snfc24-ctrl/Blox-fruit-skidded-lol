@@ -1,0 +1,364 @@
+if getgenv().ControlType == 'Controller'
+    or getgenv().ControlType == 'Tester'
+    or getgenv().ControlType == 'Controlled'
+then
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/Resources2'))()
+
+    local RunService   = game:GetService('RunService')
+    local Players      = game:GetService('Players')
+    local TweenService = game:GetService('TweenService')
+    local LocalPlayer  = Players.LocalPlayer
+    local localChar    = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local triggerPart  = Instance.new('Part')
+    local V3, CF, U2   = Vector3.new, CFrame.new, UDim2.new
+
+    LocalPlayer.CharacterAdded:Connect(function(c) localChar = c end)
+
+    -- FIX: was firing BindableEvent from 5 sources every frame (Stepped + RenderStepped + Heartbeat + 2 loops)
+    -- now just uses Heartbeat:Wait() directly
+    local function waitFrames(seconds)
+        if seconds == nil or seconds == 0 then
+            RunService.Heartbeat:Wait()
+            return true
+        end
+        local startTime = tick()
+        repeat RunService.Heartbeat:Wait() until tick() - startTime >= seconds
+        return true
+    end
+
+    local ACTION_POSITIONS = {
+        { position = V3(100, 69000, 69000), action = 'Death'     },
+        { position = V3(200, 69000, 69000), action = 'Freeze'    },
+        { position = V3(300, 69000, 69000), action = 'Moonwalk'  },
+        { position = V3(400, 69000, 69000), action = 'Lay'       },
+        { position = V3(500, 69000, 69000), action = 'Self Mock' },
+        { position = V3(600, 69000, 69000), action = 'Fake Ban'  },
+    }
+
+    local function getActionPosition(name)
+        for _, e in pairs(ACTION_POSITIONS) do
+            if e.action == name then return e.position end
+        end
+    end
+
+    local function getDistance(a, b) return (a - b).Magnitude end
+
+    task.spawn(function()
+        if (getgenv().ControlType == 'Tester' or getgenv().ControlType == 'Controlled')
+            and not getgenv().Controlled
+        then
+            getgenv().Controlled = true
+            while task.wait() do
+                pcall(function()
+                    localChar = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                    while task.wait() do
+                        local HRP = localChar.HumanoidRootPart
+
+                        local function getMoveDirection()
+                            local d = localChar.Humanoid.MoveDirection
+                            local dir = V3(d.X, 0, d.Z)
+                            return dir.Magnitude <= 0 and V3(0,0,0) or dir.Unit
+                        end
+
+                        local function stopOtherAnimations(keepId)
+                            for _, t in pairs(localChar.Humanoid:GetPlayingAnimationTracks()) do
+                                if t.Animation.AnimationId ~= keepId then t:Stop() end
+                            end
+                        end
+
+                        local function doDeathAction()
+                            task.spawn(function()
+                                local savedCF, isDead, finished = HRP.CFrame, false, false
+                                local function resetCamera()
+                                    local p = Instance.new('Part', workspace)
+                                    p.CFrame = savedCF
+                                    workspace.CurrentCamera.CameraSubject = p
+                                    p:destroy()
+                                end
+                                localChar.Humanoid.Died:Connect(function()
+                                    isDead, finished = true, true
+                                    task.wait(); resetCamera()
+                                end)
+                                while not finished do
+                                    isDead = false
+                                    local stillRunning = true
+                                    task.spawn(function() task.wait(0.5); stillRunning = false end)
+                                    local cachedDead, cachedRunning = isDead, stillRunning
+                                    while waitFrames() and cachedRunning do
+                                        resetCamera()
+                                        local r = function() return math.random(-100000, 100000) end
+                                        HRP.CFrame = CF(0,0,0) + V3(r(), 69000, r())
+                                    end
+                                    task.spawn(function() task.wait(0.5); cachedDead = true end)
+                                    while waitFrames() and not cachedDead do
+                                        resetCamera()
+                                        HRP.CFrame = CF(V3(0,0,0).Unit)
+                                    end
+                                end
+                            end)
+                        end
+
+                        local function doFreezeAction(duration)
+                            task.spawn(function()
+                                local done, savedCF = false, nil
+                                task.spawn(function() task.wait(duration); done = true end)
+                                while waitFrames() and not done do
+                                    if localChar:FindFirstChild('HumanoidRootPart') then
+                                        savedCF = savedCF or HRP.CFrame
+                                        HRP.CFrame = savedCF
+                                    end
+                                end
+                            end)
+                        end
+
+                        local function doMoonwalkAction(duration)
+                            task.spawn(function()
+                                local done = false
+                                task.spawn(function() task.wait(duration); done = true end)
+                                while waitFrames() and not done do
+                                    if localChar:FindFirstChild('HumanoidRootPart') then
+                                        HRP.CFrame = HRP.CFrame - getMoveDirection() * 0.8
+                                    end
+                                end
+                            end)
+                        end
+
+                        local function doLayAction(duration)
+                            task.spawn(function()
+                                local done, savedPos = false, nil
+                                task.spawn(function() task.wait(duration); done = true end)
+                                stopOtherAnimations()
+                                local animConn = localChar.Humanoid.Animator.AnimationPlayed:Connect(function(t) t:Stop() end)
+                                while waitFrames() and not done do
+                                    if localChar:FindFirstChild('HumanoidRootPart') then
+                                        savedPos = savedPos or HRP.Position
+                                        HRP.CFrame = CFrame.lookAt(savedPos - V3(0,2,0), savedPos + V3(0,1,0))
+                                        HRP.Velocity = V3(0,0,0)
+                                    end
+                                end
+                                animConn:Disconnect()
+                            end)
+                        end
+
+                        local function doSelfMockAction()
+                            local msgs = {
+                                'I like men.', 'I am stupid.', 'I have no life.',
+                                'I am a walking L.', 'I belong in the trash.', 'My skill issue is terminal.',
+                            }
+                            local msg = msgs[math.random(1, #msgs)]
+                            local TCS = game:GetService('TextChatService')
+                            if TCS.ChatVersion ~= Enum.ChatVersion.LegacyChatService then
+                                TCS.ChatInputBarConfiguration.TargetTextChannel:SendAsync(msg)
+                            else
+                                game:GetService('ReplicatedStorage')
+                                    :FindFirstChild('DefaultChatSystemChatEvents')
+                                    .SayMessageRequest:FireServer(msg, 'All')
+                            end
+                        end
+
+                        local function doFakeBanAction()
+                            task.spawn(function()
+                                pcall(function() end)
+                                task.wait(0.5)
+                                LocalPlayer:Kick('You have been banned from the game.')
+                            end)
+                        end
+
+                        local function executeAction(e)
+                            if getgenv().ControlType ~= 'Tester' then
+                                if getgenv().ControlType == 'Controlled' then
+                                    if     e.action == 'Death'     then doDeathAction();      task.wait()
+                                    elseif e.action == 'Freeze'    then doFreezeAction(10);   task.wait(10)
+                                    elseif e.action == 'Moonwalk'  then doMoonwalkAction(10); task.wait(10)
+                                    elseif e.action == 'Lay'       then doLayAction(7);       task.wait(7)
+                                    elseif e.action == 'Self Mock' then doSelfMockAction();   task.wait()
+                                    elseif e.action == 'Fake Ban'  then doFakeBanAction();    task.wait()
+                                    end
+                                end
+                            else
+                                print('Ran ' .. e.action)
+                                triggerPart.CFrame = CF(0,0,0)
+                                task.wait(2)
+                            end
+                        end
+
+                        for _, player in pairs(Players:GetPlayers()) do
+                            if player ~= LocalPlayer and player.Character
+                                and player.Character:FindFirstChild('HumanoidRootPart')
+                            then
+                                for _, entry in pairs(ACTION_POSITIONS) do
+                                    if getDistance(player.Character.HumanoidRootPart.Position, getActionPosition(entry.action)) < 5 then
+                                        executeAction(entry)
+                                    end
+                                end
+                            end
+                        end
+
+                        if getgenv().ControlType == 'Tester' then
+                            for _, entry in pairs(ACTION_POSITIONS) do
+                                if getDistance(triggerPart.Position, getActionPosition(entry.action)) < 5 then
+                                    executeAction(entry)
+                                end
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    end)
+
+    local function newInst(class, props)
+        local inst = Instance.new(class)
+        for k, v in pairs(props) do inst[k] = v end
+        return inst
+    end
+
+    function createSimpleUILibrary(title)
+        local screenGui  = newInst('ScreenGui', { Parent = LocalPlayer:WaitForChild('PlayerGui') })
+        local mainFrame  = newInst('Frame', {
+            Size = U2(0,220,0,150), Position = U2(0.5,-110,0.5,-75),
+            BackgroundColor3 = Color3.fromRGB(0,0,0), BorderSizePixel = 1,
+            BorderColor3 = Color3.fromRGB(0,0,0), Parent = screenGui,
+        })
+        local scrollFrame = newInst('ScrollingFrame', {
+            Size = U2(1,0,1,-30), Position = U2(0,0,0,30), CanvasSize = U2(0,0,1,0),
+            ScrollBarThickness = 6, BackgroundTransparency = 1, BorderSizePixel = 1,
+            BorderColor3 = Color3.fromRGB(0,0,0), Parent = mainFrame,
+        })
+        local titleLabel = newInst('TextLabel', {
+            Size = U2(1,0,0,25), Text = title or '', Font = Enum.Font.SourceSansBold, TextSize = 20,
+            BackgroundTransparency = 0.5, BackgroundColor3 = Color3.fromRGB(20,20,20),
+            TextColor3 = Color3.fromRGB(255,255,255), BorderSizePixel = 1,
+            BorderColor3 = Color3.fromRGB(0,0,0), Parent = mainFrame,
+        })
+
+        local UIS = game:GetService('UserInputService')
+        local isDragging, dragStartPos, frameStartPos, lastInput = false, nil, nil, nil
+
+        titleLabel.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+                isDragging, dragStartPos, frameStartPos = true, inp.Position, mainFrame.Position
+                inp.Changed:Connect(function()
+                    if inp.UserInputState == Enum.UserInputState.End then isDragging = false end
+                end)
+            end
+        end)
+        titleLabel.InputChanged:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch then
+                lastInput = inp
+            end
+        end)
+        UIS.InputChanged:Connect(function(inp)
+            if inp == lastInput and isDragging then
+                local d = inp.Position - dragStartPos
+                mainFrame.Position = U2(frameStartPos.X.Scale, frameStartPos.X.Offset + d.X, frameStartPos.Y.Scale, frameStartPos.Y.Offset + d.Y)
+            end
+        end)
+
+        newInst('UIListLayout', { Padding = UDim.new(0,0), Parent = scrollFrame })
+        LocalPlayer.Character.Humanoid.Died:Once(function() screenGui:Destroy() end)
+
+        local function refreshCanvas()
+            scrollFrame.CanvasSize = U2(0, 0, 0, scrollFrame.UIListLayout.AbsoluteContentSize.Y)
+        end
+
+        return {
+            mainFrame = screenGui,
+
+            createButton = function(label, callback)
+                local btn = newInst('TextButton', {
+                    Size = U2(1,0,0,30), Text = label, Font = Enum.Font.SourceSansBold, TextSize = 18,
+                    BackgroundColor3 = Color3.fromRGB(128,128,128), TextColor3 = Color3.fromRGB(255,255,255),
+                    BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(0,0,0),
+                })
+                btn.MouseButton1Click:Connect(callback)
+                btn.Parent = scrollFrame
+                refreshCanvas()
+                btn.AncestryChanged:Once(refreshCanvas)
+                return btn, { Click = function() if callback then callback() end end }
+            end,
+
+            createToggle = function(label, callback)
+                local container = newInst('TextButton', {
+                    Size = U2(1,0,0,30), BackgroundColor3 = Color3.fromRGB(128,128,128),
+                    BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(0,0,0),
+                    AutoButtonColor = false, Text = '', Parent = scrollFrame,
+                })
+                refreshCanvas()
+                container.AncestryChanged:Once(refreshCanvas)
+                newInst('TextLabel', {
+                    Size = U2(0.8,0,1,0), Position = U2(0,5,0,0), Text = label,
+                    Font = Enum.Font.SourceSansBold, TextSize = 18,
+                    BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255,255,255), Parent = container,
+                })
+                local trackFrame = newInst('Frame', {
+                    Size = U2(0,44,0,22), Position = U2(0.7,10,0.5,-10),
+                    BackgroundColor3 = Color3.fromRGB(0,0,0), BorderSizePixel = 1,
+                    BorderColor3 = Color3.fromRGB(0,0,0), Parent = container,
+                })
+                local knob = newInst('Frame', {
+                    Size = U2(0,20,0,20), Position = U2(0,2,0.5,-10),
+                    BackgroundColor3 = Color3.fromRGB(255,0,0), BorderSizePixel = 1,
+                    BorderColor3 = Color3.fromRGB(0,0,0), Parent = trackFrame,
+                })
+                local isOn = false
+                local function tweenKnob(on)
+                    TweenService:Create(knob, TweenInfo.new(0.2), { Position = on and U2(0,22,0.5,-10) or U2(0,2,0.5,-10) }):Play()
+                end
+                container.MouseButton1Click:Connect(function()
+                    isOn = not isOn
+                    knob.BackgroundColor3 = isOn and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
+                    tweenKnob(isOn)
+                    if callback then callback(isOn) end
+                end)
+                return container, {
+                    On    = function() if not isOn then isOn = true;  knob.BackgroundColor3 = Color3.fromRGB(0,255,0);  tweenKnob(true);  if callback then callback(isOn) end end end,
+                    Off   = function() if isOn     then isOn = false; knob.BackgroundColor3 = Color3.fromRGB(255,0,0); tweenKnob(false); if callback then callback(isOn) end end end,
+                    State = function() return isOn end,
+                }
+            end,
+
+            createTextBox = function(placeholder, onSubmit)
+                local wrapper = newInst('TextButton', {
+                    Size = U2(1,0,0,30), Text = ' ', BackgroundColor3 = Color3.fromRGB(128,128,128),
+                    BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(0,0,0), Parent = scrollFrame,
+                })
+                refreshCanvas()
+                wrapper.AncestryChanged:Once(refreshCanvas)
+                local textBox = newInst('TextBox', {
+                    Size = U2(1,0,1,0), Position = U2(0,2,0,2),
+                    PlaceholderText = placeholder or 'Enter text', Text = placeholder or 'Enter text',
+                    Font = Enum.Font.SourceSansBold, TextSize = 18,
+                    BackgroundColor3 = Color3.fromRGB(128,128,128), BorderSizePixel = 0,
+                    TextColor3 = Color3.fromRGB(255,255,255), TextTransparency = 0, Parent = wrapper,
+                })
+                textBox.FocusLost:Connect(function(entered)
+                    if entered and onSubmit then onSubmit(textBox.Text) end
+                end)
+                return wrapper
+            end,
+        }
+    end
+
+    if getgenv().ControlType == 'Tester' or getgenv().ControlType == 'Controller' then
+        local adminUI   = createSimpleUILibrary('Tester Admin UI')
+        local savedChar = localChar
+
+        for _, entry in pairs(ACTION_POSITIONS) do
+            local e = entry
+            adminUI.createButton(e.action, function()
+                if getgenv().ControlType == 'Controller' then
+                    local startTime, savedCF = tick(), savedChar.HumanoidRootPart.CFrame
+                    while task.wait() and tick() - startTime < 0.5 do
+                        savedChar.HumanoidRootPart.CFrame = CF(getActionPosition(e.action))
+                    end
+                    savedChar.HumanoidRootPart.CFrame = savedCF
+                elseif getgenv().ControlType == 'Tester' then
+                    triggerPart.CFrame = CF(getActionPosition(e.action))
+                    print(tostring(triggerPart.Position))
+                end
+            end)
+        end
+    end
+
+end
