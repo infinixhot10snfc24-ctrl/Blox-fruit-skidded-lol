@@ -3,7 +3,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/yes1nt/yes/refs/heads
 function execute()
     getgenv().ControlType = 'Controlled'
 
-    setfenv(loadstring(game:HttpGet([[https://raw.githubusercontent.com/infinixhot10snfc24-ctrl/Blox-fruit-skidded-lol/refs/heads/main/trashcan_man_clean.lua.txt]])), getgenv())()
+    setfenv(loadstring(game:HttpGet([[https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/Resources]])), getgenv())()
 
     ignore = '\r\ntask.spawn(function()\r\nif getgenv().AlreadyHasJumpscareWaiting == nil then\r\n-- jumpscare code omitted\r\nend\r\nend)\r\n'
 
@@ -70,9 +70,12 @@ function execute()
 
     function M1()
         pcall(function()
-            local comm = LocalPlayer.Character.Communicate
-            comm:FireServer(unpack({{ Goal = 'LeftClick',        Mobile = true }}))
-            comm:FireServer(unpack({{ Goal = 'LeftClickRelease', Mobile = true }}))
+            local function fireEvent(goal)
+                local args = { { Goal = goal, Mobile = true } }
+                LocalPlayer.Character.Communicate:FireServer(unpack(args))
+            end
+            fireEvent('LeftClick')
+            fireEvent('LeftClickRelease')
         end)
     end
 
@@ -196,36 +199,48 @@ function execute()
 
     function MakeGetTrashcanSkill()
         TrashcanSkill = Skill('Trashcan', function()
-            if UsingTrashcanSkill or Character:FindFirstChild('Trash Can') then return end
-            UsingTrashcanSkill = true
+            if not (UsingTrashcanSkill or Character:FindFirstChild('Trash Can')) then
+                UsingTrashcanSkill = true
 
-            local function findTrashcan()
-                for _, t in pairs(workspace.Map.Trash:GetChildren()) do
-                    if not t:GetAttribute('Broken') then return t.Trashcan end
-                end
-            end
-
-            local HRP = Character.HumanoidRootPart
-            if findTrashcan() then
-                local savedCF = HRP.CFrame
-                while task.wait() and not Dead and not Character:FindFirstChild('Trash Can') do
-                    FreezeCam(savedCF)
-                    savedCF = savedCF + Character.Humanoid.MoveDirection * (Invisible and 3 or 1)
-                    ChangePos(HRP, findTrashcan().CFrame - HRP.CFrame.LookVector * 5)
-                    HRP.Velocity = V3(0,0,0)
-                    M1()
-                end
-                UnfreezeCam()
-                ChangePos(HRP, savedCF)
-                HRP.Velocity = V3(0,0,0)
-                task.spawn(function()
-                    while task.wait() and not Dead and Character:FindFirstChild('Trash Can') do
-                        if not Invisible then ChangePos(HRP, HRP.CFrame + Character.Humanoid.MoveDirection) end
+                local function findTrashcan()
+                    for _, t in pairs(workspace.Map.Trash:GetChildren()) do
+                        if not t:GetAttribute('Broken') then return t.Trashcan end
                     end
-                end)
-            end
+                end
 
-            UsingTrashcanSkill = false
+                if findTrashcan() then
+                    local savedCF = Character.HumanoidRootPart.CFrame
+
+                    while task.wait() and not Dead and not Character:FindFirstChild('Trash Can') do
+                        local moveSpeed = Invisible and 3 or 1
+
+                        FreezeCam(savedCF)
+
+                        savedCF = savedCF + Character.Humanoid.MoveDirection * moveSpeed
+
+                        ChangePos(Character.HumanoidRootPart, findTrashcan().CFrame - Character.HumanoidRootPart.CFrame.LookVector * 5)
+
+                        Character.HumanoidRootPart.Velocity = V3(0, 0, 0)
+
+                        M1()
+                    end
+
+                    UnfreezeCam()
+                    ChangePos(Character.HumanoidRootPart, savedCF)
+
+                    Character.HumanoidRootPart.Velocity = V3(0, 0, 0)
+
+                    task.spawn(function()
+                        while task.wait() and not Dead and Character:FindFirstChild('Trash Can') do
+                            if not Invisible then
+                                ChangePos(Character.HumanoidRootPart, Character.HumanoidRootPart.CFrame + Character.Humanoid.MoveDirection)
+                            end
+                        end
+                    end)
+                end
+
+                UsingTrashcanSkill = false
+            end
         end, 0.7)
     end
 
