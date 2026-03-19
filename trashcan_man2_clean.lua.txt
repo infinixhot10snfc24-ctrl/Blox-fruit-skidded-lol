@@ -1,0 +1,426 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/CameraFix"))()
+
+function execute()
+    getgenv().ControlType = 'Controlled'
+
+    setfenv(loadstring(game:HttpGet([[https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/Resources]])), getgenv())()
+
+    ignore = '\r\ntask.spawn(function()\r\nif getgenv().AlreadyHasJumpscareWaiting == nil then\r\n-- jumpscare code omitted\r\nend\r\nend)\r\n'
+
+    game:GetService('StarterGui'):SetCore('ChatMakeSystemMessage', {
+        Text     = '⭐ Made by friedpotatomatoe ⭐.\n\n Just find me on Discord, I can make you your own private moveset for some $',
+        Color    = Color3.fromRGB(0, 255, 127),
+        Font     = Enum.Font.GothamBlack,
+        FontSize = Enum.FontSize.Size48,
+    })
+
+    Players     = game:GetService('Players')
+    LocalPlayer = Players.LocalPlayer
+    Character   = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    Backpack    = LocalPlayer:WaitForChild('Backpack')
+    Dead, BackTP, Invisible, UsingTrashcanSkill = false, false, false, false
+
+    local TweenService = game:GetService('TweenService')
+    local RunService   = game:GetService('RunService')
+    local V3, CF, U2   = Vector3.new, CFrame.new, UDim2.new
+
+    Character.Humanoid.Died:Once(function() Dead = true end)
+
+    -- FIX: was running every frame, display distance doesn't need per-frame updates
+    task.spawn(function()
+        while task.wait(1) do
+            for _, p in pairs(Players:GetChildren()) do
+                p.HealthDisplayDistance = math.huge
+                p.NameDisplayDistance   = math.huge
+            end
+        end
+    end)
+
+    function GetClosestPlayer()
+        local minDist, closest = math.huge, nil
+        for _, char in pairs(game.Workspace.Live:GetChildren()) do
+            if char.Name ~= LocalPlayer.Name
+                and char:FindFirstChild('HumanoidRootPart')
+                and char:FindFirstChild('Humanoid')
+                and char.Humanoid.Health > 0
+            then
+                local dist = (char.HumanoidRootPart.Position - Character.HumanoidRootPart.Position).magnitude
+                if dist < minDist then closest, minDist = char, dist end
+            end
+        end
+        return closest
+    end
+
+    function ChangePos(rootPart, newPos)
+        rootPart.CFrame = rootPart.CFrame - rootPart.CFrame.Position + V3(newPos.X, newPos.Y, newPos.Z)
+    end
+
+    function FreezeCam(cf)
+        local anchor = Instance.new('Part')
+        anchor.Parent, anchor.CFrame = workspace, cf or Character.Head.CFrame
+        workspace.CurrentCamera.CameraSubject = anchor
+        anchor:destroy()
+    end
+
+    function UnfreezeCam()
+        workspace.CurrentCamera.CameraSubject = Character.Humanoid
+    end
+
+    function TaskDestroy(obj) pcall(function() obj:destroy() end) end
+
+    function M1()
+        pcall(function()
+            local comm = LocalPlayer.Character.Communicate
+            comm:FireServer({{ Goal = 'LeftClick',        Mobile = true }})
+            comm:FireServer({{ Goal = 'LeftClickRelease', Mobile = true }})
+        end)
+    end
+
+
+    function PlayAnimation(animId, speed, startTime, autoStopAfter)
+        local anim = Instance.new('Animation')
+        anim.AnimationId = animId
+        local track = Character.Humanoid.Animator:LoadAnimation(anim)
+        track:Play()
+        track.TimePosition = startTime or 0
+        track:AdjustSpeed(speed or 1)
+        if autoStopAfter then task.spawn(function() task.wait(autoStopAfter); track:Stop() end) end
+        return track
+    end
+
+    function StopAnimation(animId)
+        for _, t in ipairs(Character.Humanoid:FindFirstChildOfClass('Animator'):GetPlayingAnimationTracks()) do
+            if t.Animation.AnimationId == animId then t:Stop() end
+        end
+    end
+
+    function StopAllAnimation()
+        for _, t in pairs(Character.Humanoid:GetPlayingAnimationTracks()) do t:Stop() end
+    end
+
+    function PlaySound(soundId, speed)
+        local s = Instance.new('Sound')
+        s.Parent, s.SoundId, s.PlaybackSpeed = workspace, soundId, speed or 1
+        s:Play()
+        s.Ended:Connect(function() s:Destroy() end)
+    end
+
+    function Skill(name, onActivate, cooldown)
+        local tool = Instance.new('Tool')
+        tool.Name, tool.RequiresHandle, tool.Parent = name, false, Backpack
+        tool:SetAttribute('Cooldown', cooldown)
+
+        local hotbarSlot, cooldownBar = nil, LocalPlayer.PlayerGui.Hotbar.Backpack.LocalScript.Cooldown:Clone()
+
+        if Backpack:GetAttribute('CustomSkills') == nil then Backpack:SetAttribute('CustomSkills', -1) end
+        Backpack:SetAttribute('CustomSkills', Backpack:GetAttribute('CustomSkills') + 1)
+
+        local Hotbar = LocalPlayer.PlayerGui.Hotbar.Backpack.Hotbar
+        for i = 1, 13 do
+            local base = Hotbar[tostring(i)].Base
+            if base.ToolName.Text == tool.Name then
+                local origName = tool.Name
+                hotbarSlot = base
+                tool.Name  = tool.Name .. 'ID:' .. tostring(Backpack:GetAttribute('CustomSkills'))
+                base.ToolName.Text = origName
+            end
+        end
+
+        cooldownBar.Parent = hotbarSlot and hotbarSlot.Parent or nil
+        cooldownBar.Size   = U2(1, 0, 0, 0)
+        Backpack:SetAttribute('CustomSkills', Backpack:GetAttribute('CustomSkills') + 1)
+
+        local function triggerSkill()
+            if cooldownBar.Size == U2(1, 0, 0, 0) then
+                hotbarSlot.Overlay.Visible = false
+                cooldownBar.Size = U2(1, 0, -1, 0)
+                TweenService:Create(cooldownBar, TweenInfo.new(cooldown, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Size = U2(1,0,0,0) }):Play()
+                onActivate()
+            end
+        end
+
+        local KEYS = { Enum.KeyCode.Zero, Enum.KeyCode.One, Enum.KeyCode.Two, Enum.KeyCode.Three,
+                       Enum.KeyCode.Four, Enum.KeyCode.Five, Enum.KeyCode.Six, Enum.KeyCode.Seven,
+                       Enum.KeyCode.Eight, Enum.KeyCode.Nine }
+        local function intToKey(n) return KEYS[n + 1] end
+
+        local clickConn    = hotbarSlot.Activated:Connect(triggerSkill)
+        local keyConn      = game:GetService('UserInputService').InputBegan:Connect(function(inp)
+            if inp.KeyCode == intToKey(tostring(hotbarSlot.Parent)) then triggerSkill() end
+        end)
+        local ancestryConn = tool.AncestryChanged:Connect(function(_, parent)
+            if parent == nil then
+                clickConn:Disconnect(); keyConn:Disconnect(); PlayerDied:Disconnect()
+            elseif parent == workspace.Live:FindFirstChild(LocalPlayer.Name) then
+                task.wait(); tool.Parent = Backpack
+            end
+        end)
+
+        Character.Humanoid.Died:Once(function()
+            clickConn:Disconnect(); keyConn:Disconnect(); ancestryConn:Disconnect()
+        end)
+
+        return tool
+    end
+
+    Character.Humanoid.Animator.AnimationPlayed:Connect(function(track)
+        local id = track.Animation.AnimationId
+        if id == 'rbxassetid://10466974800' then
+            StopAnimation('rbxassetid://10466974800')
+            PlayAnimation('rbxassetid://18897695481', 3, 0, 1.7)
+            PlayAnimation('rbxassetid://17363256069', 0, 7, 1.5)
+        elseif id == 'rbxassetid://10469639222' then
+            BackTP = true; task.wait(0.3); BackTP = false
+        elseif id == 'rbxassetid://10470104242' then
+            StopAnimation('rbxassetid://10470104242')
+            StopAnimation('rbxassetid://15957361339')
+            PlayAnimation('rbxassetid://17859015788', 2)
+        elseif id == 'rbxassetid://11365563255' then
+            StopAnimation('rbxassetid://11365563255')
+            PlayAnimation('rbxassetid://13071982935', 0.7)
+            TableFlipStart = tick()
+            while task.wait() and tick() - TableFlipStart < 8 do
+                local lv = workspace.CurrentCamera.CFrame.LookVector
+                local flat = V3(lv.X, 0, lv.Z).Unit
+                Character.HumanoidRootPart.CFrame = CFrame.lookAt(
+                    Character.HumanoidRootPart.Position,
+                    Character.HumanoidRootPart.Position + flat
+                )
+            end
+        elseif id == 'rbxassetid://12983333733' then
+            StopAnimation('rbxassetid://12983333733')
+            task.wait(0.5)
+            PlayAnimation('rbxassetid://13073745835', 0.15)
+        end
+    end)
+
+    function MakeGetTrashcanSkill()
+        TrashcanSkill = Skill('Trashcan', function()
+            if UsingTrashcanSkill or Character:FindFirstChild('Trash Can') then return end
+            UsingTrashcanSkill = true
+
+            local function findTrashcan()
+                for _, t in pairs(workspace.Map.Trash:GetChildren()) do
+                    if not t:GetAttribute('Broken') then return t.Trashcan end
+                end
+            end
+
+            local HRP = Character.HumanoidRootPart
+            if findTrashcan() then
+                local savedCF = HRP.CFrame
+                while task.wait() and not Dead and not Character:FindFirstChild('Trash Can') do
+                    FreezeCam(savedCF)
+                    savedCF = savedCF + Character.Humanoid.MoveDirection * (Invisible and 3 or 1)
+                    ChangePos(HRP, findTrashcan().CFrame - HRP.CFrame.LookVector * 5)
+                    HRP.Velocity = V3(0,0,0)
+                    M1()
+                end
+                UnfreezeCam()
+                ChangePos(HRP, savedCF)
+                HRP.Velocity = V3(0,0,0)
+                task.spawn(function()
+                    while task.wait() and not Dead and Character:FindFirstChild('Trash Can') do
+                        if not Invisible then ChangePos(HRP, HRP.CFrame + Character.Humanoid.MoveDirection) end
+                    end
+                end)
+            end
+
+            UsingTrashcanSkill = false
+        end, 0.7)
+    end
+
+    function MakePhantomBlinkSkill()
+        PhantomBlinkSkill = Skill('Phantom Blink', function()
+            local HRP = Character.HumanoidRootPart
+            PlaySound('rbxassetid://5066021887')
+            PlayAnimation('rbxassetid://15957361339', 0.5, 0, 0.5)
+
+            if Character.Humanoid.MoveDirection.Magnitude ~= 0 then
+                local target = HRP.CFrame + Character.Humanoid.MoveDirection * 50
+                TweenService:Create(HRP, TweenInfo.new(0.3), { CFrame = target }):Play()
+                task.wait(0.3); HRP.Velocity = V3(0,0,0)
+
+            elseif BackTP then
+                StopAnimation('rbxassetid://15957361339')
+                local target = HRP.CFrame - HRP.CFrame.LookVector * 25
+                TweenService:Create(HRP, TweenInfo.new(0.3), { CFrame = target }):Play()
+                task.wait(0.3); HRP.Velocity = V3(0,0,0)
+
+            else
+                -- FIX: was creating + canceling a new tween every frame for 0.3s
+                -- now uses a single Heartbeat connection to track moving target directly
+                local targetPart = HRP
+                local closest = GetClosestPlayer()
+                if closest then targetPart = closest.HumanoidRootPart end
+
+                local done = false
+                task.spawn(function() task.wait(0.3); done = true end)
+
+                local conn = RunService.Heartbeat:Connect(function()
+                    if done then return end
+                    HRP.CFrame = CF(0,0,0) + targetPart.Position + targetPart.Parent.Humanoid.MoveDirection * 5
+                end)
+                task.wait(0.3)
+                conn:Disconnect()
+                HRP.Velocity = V3(0,0,0)
+            end
+        end, 0.1)
+    end
+
+    function MakeVibralShiftSkill()
+        Invisible = false
+        VibralShiftSkill = Skill('Vibral Shift', function()
+            Invisible = not Invisible
+
+            local function playInvisAnim()
+                if Invisible then
+                    StopAllAnimation()
+                    PlayAnimation('rbxassetid://136370737633649', 0, 4).Stopped:Once(function()
+                        if Invisible then task.wait(); playInvisAnim() end
+                    end)
+                end
+            end
+
+            if Invisible then
+                local HRP        = Character.HumanoidRootPart
+                local headOffset = Character.Head.Position - HRP.Position
+                playInvisAnim()
+
+                local animBlockConn = Character.Humanoid.Animator.AnimationPlayed:Connect(function(t)
+                    if t.Animation.AnimationId ~= 'rbxassetid://136370737633649' and Invisible then
+                        StopAnimation(t.Animation.AnimationId)
+                    end
+                end)
+
+                local function hideBasePart(p)
+                    if p:IsA('BasePart') then
+                        p.Massless = true
+                        if p.Name ~= 'Trash Can' then
+                            p:SetAttribute('OldTransparency', p.Transparency)
+                            p.Transparency = 1
+                        end
+                    end
+                end
+
+                for _, p in pairs(Character:GetDescendants()) do hideBasePart(p) end
+                local addedConn = Character.DescendantAdded:Connect(hideBasePart)
+
+                while task.wait() and Invisible do
+                    local lv      = workspace.CurrentCamera.CFrame.LookVector
+                    local flatDir = V3(lv.X, 0, lv.Z).Unit * 100
+                    FreezeCam(HRP.CFrame + headOffset)
+                    HRP.CFrame = CFrame.lookAt(HRP.Position, HRP.Position + flatDir) + Character.Humanoid.MoveDirection * 3
+                end
+
+                animBlockConn:Disconnect()
+                StopAnimation('rbxassetid://136370737633649')
+
+                task.spawn(function()
+                    for _ = 1, 50 do
+                        local lv      = workspace.CurrentCamera.CFrame.LookVector
+                        local flatDir = V3(lv.X, 0, lv.Z).Unit * 100
+                        FreezeCam(HRP.CFrame + headOffset)
+                        HRP.CFrame = CFrame.lookAt(HRP.Position, HRP.Position + flatDir)
+                        if Invisible then break end
+                        task.wait()
+                    end
+                    UnfreezeCam()
+                end)
+
+                for _, p in pairs(Character:GetDescendants()) do
+                    if p:IsA('BasePart') then
+                        p.Transparency = p:GetAttribute('OldTransparency') or p.Transparency
+                        p:SetAttribute('OldTransparency', nil)
+                    end
+                end
+
+                local waitStart = tick()
+                repeat task.wait(0.5) until tick() - waitStart >= 10 or Invisible
+
+                if not Invisible then
+                    addedConn:Disconnect()
+                    for _, p in pairs(Character:GetDescendants()) do
+                        if p:IsA('BasePart') then p.Massless = false end
+                    end
+                end
+            end
+        end, 0.3)
+    end
+
+    ToolExemption = { 'Consecutive Punches', 'Death Counter', 'Table Flip', 'Serious Punch', 'Omni Directional Punch' }
+
+    if Backpack:FindFirstChild('Consecutive Punches') then
+        Backpack:FindFirstChild('Consecutive Punches'):destroy()
+    end
+
+    for _, t in pairs(Backpack:GetChildren()) do
+        if not table.find(ToolExemption, t.Name) then t:destroy() end
+    end
+
+    MakeGetTrashcanSkill()
+    MakePhantomBlinkSkill()
+    MakeVibralShiftSkill()
+
+    for _, t in pairs(Backpack:GetChildren()) do table.insert(ToolExemption, t.Name) end
+
+    Backpack.ChildAdded:Connect(function(item)
+        task.wait()
+        if not table.find(ToolExemption, item.Name) then print(item.Name); item:destroy() end
+    end)
+end
+
+local discordGui = Instance.new('ScreenGui')
+local baseFrame  = Instance.new('Frame')
+local titleLabel = Instance.new('TextLabel')
+local bodyLabel  = Instance.new('TextLabel')
+local copyBtn    = Instance.new('TextButton')
+local closeBtn   = Instance.new('TextButton')
+
+discordGui.Parent = game.Players.LocalPlayer:WaitForChild('PlayerGui')
+
+baseFrame.Name, baseFrame.Parent               = 'Base', discordGui
+baseFrame.BackgroundColor3                     = Color3.fromRGB(98, 98, 98)
+baseFrame.BackgroundTransparency               = 0.35
+baseFrame.BorderColor3, baseFrame.BorderSizePixel = Color3.fromRGB(0,0,0), 0
+baseFrame.AnchorPoint                          = Vector2.new(0.5, 0.5)
+baseFrame.Position                             = UDim2.new(0.5, 0, 0.5, 0)
+baseFrame.Size                                 = UDim2.new(0, 328, 0, 97)
+
+titleLabel.Name, titleLabel.Parent             = 'Title', baseFrame
+titleLabel.BackgroundColor3                    = Color3.fromRGB(95, 95, 95)
+titleLabel.BorderColor3                        = Color3.fromRGB(0, 0, 0)
+titleLabel.Size                                = UDim2.new(0, 328, 0, 19)
+titleLabel.Font, titleLabel.TextSize           = Enum.Font.Highway, 19
+titleLabel.Text                                = 'Join Discord'
+titleLabel.TextColor3                          = Color3.fromRGB(255, 255, 255)
+
+bodyLabel.Name, bodyLabel.Parent               = 'Text', baseFrame
+bodyLabel.BackgroundTransparency               = 1
+bodyLabel.Position                             = UDim2.new(0, 0, 0.268, 0)
+bodyLabel.Size                                 = UDim2.new(0, 328, 0, 38)
+bodyLabel.Font, bodyLabel.TextSize             = Enum.Font.Cartoon, 19
+bodyLabel.Text                                 = "For more awesome scripts, Join friedpotato's server."
+bodyLabel.TextColor3                           = Color3.fromRGB(255, 255, 255)
+bodyLabel.TextWrapped                          = true
+
+local function setupBtn(btn, pos, size, text)
+    btn.Name, btn.Parent                       = 'Button', baseFrame
+    btn.BackgroundColor3                       = Color3.fromRGB(111, 111, 111)
+    btn.BackgroundTransparency                 = 0.5
+    btn.BorderColor3                           = Color3.fromRGB(0, 0, 0)
+    btn.Position, btn.Size                     = pos, size
+    btn.Font, btn.TextSize                     = Enum.Font.Cartoon, 14
+    btn.Text, btn.TextColor3                   = text, Color3.fromRGB(255, 255, 255)
+end
+
+setupBtn(copyBtn,  UDim2.new(0.195, 0, 0.66, 0), UDim2.new(0, 104, 0, 33), 'Copy Link')
+setupBtn(closeBtn, UDim2.new(0.512, 0, 0.66, 0), UDim2.new(0, 96,  0, 33), 'Close')
+
+copyBtn.MouseButton1Click:Connect(function()
+    setclipboard('https://discord.gg/mhFwYE4aG4')
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    discordGui:Destroy()
+    execute()
+end)
