@@ -1,10 +1,44 @@
-local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
-local plr = Players.LocalPlayer
+local P, WS, RS, TS = game:GetService("Players"), game:GetService("Workspace"), game:GetService("ReplicatedStorage"), game:GetService("TweenService")
+local plr = P.LocalPlayer
+local GLOBAL_SPEED = 400
 
-local QuestList = {
+getgenv().IslandList = {
+    ["Sea1"] = {
+        ["Starter Pirate"] = CFrame.new(1060, 16, 1424),
+        ["Starter Marine"] = CFrame.new(-2566, 7, 2055),
+        ["Jungle"] = CFrame.new(-1255, 12, 335),
+        ["Pirate Village"] = CFrame.new(-1146, 5, 3824),
+        ["Desert"] = CFrame.new(944, 6, 4327),
+        ["Frozen Village"] = CFrame.new(1143, 6, -1141),
+        ["Marine Fortress"] = CFrame.new(-4892, 10, 4281),
+        ["Skylands"] = CFrame.new(-1653, 314, -2313),
+        ["Prison"] = CFrame.new(4825, 6, 747),
+        ["Magma Village"] = CFrame.new(-5242, 8, 8527),
+        ["Underwater City"] = CFrame.new(61122, 18, 1565),
+        ["Fountain City"] = CFrame.new(5125, 6, 4118)
+    },
+    ["Sea2"] = {
+        ["Kingdom of Rose"] = CFrame.new(-457, 73, 283),
+        ["Green Zone"] = CFrame.new(-2383, 73, -3107),
+        ["Graveyard"] = CFrame.new(-5414, 21, -812),
+        ["Snow Mountain"] = CFrame.new(777, 401, -5264),
+        ["Hot and Cold"] = CFrame.new(-5904, 15, -5126),
+        ["Cursed Ship"] = CFrame.new(923, 125, 32885),
+        ["Ice Castle"] = CFrame.new(6090, 28, -6267),
+        ["Forgotten Island"] = CFrame.new(-3034, 237, -10182),
+        ["Dark Arena"] = CFrame.new(3854, 15, -3613)
+    },
+    ["Sea3"] = {
+        ["Port Town"] = CFrame.new(-290, 7, 5326),
+        ["Hydra Island"] = CFrame.new(5747, 603, -241),
+        ["Floating Turtle"] = CFrame.new(-13233, 531, -7576),
+        ["Castle on the Sea"] = CFrame.new(-5038, 315, -3160),
+        ["Haunted Castle"] = CFrame.new(-9520, 164, 5783),
+        ["Sea of Treats"] = CFrame.new(-1052, 15, -13554)
+    }
+}
+
+getgenv().QuestList = {
     ["Sea1"] = {
         {Level = 0, QuestName = "BanditQuest1", MonName = "Bandit", NPCPos = CFrame.new(1060, 16, 1547), LevelQuest = 1},
         {Level = 10, QuestName = "JungleQuest", MonName = "Monkey", NPCPos = CFrame.new(-1601, 36, 153), LevelQuest = 1},
@@ -107,48 +141,47 @@ local function GetCurrentSea()
     return "Sea1"
 end
 
-local function Tween(TargetCFrame)
-    if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then return end
-    local Root = plr.Character.HumanoidRootPart
-    local Distance = (TargetCFrame.Position - Root.Position).Magnitude
-    local Speed = 400
-    local Info = TweenInfo.new(Distance / Speed, Enum.EasingStyle.Linear)
-    local Anim = TweenService:Create(Root, Info, {CFrame = TargetCFrame})
-    Anim:Play()
-    Anim.Completed:Wait()
+local function GetRoot() return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") end
+
+local function Tween(TCF)
+    local Root = GetRoot()
+    if not Root then return end
+    local Dist = (TCF.Position - Root.Position).Magnitude
+    if Dist < 15 then Root.CFrame = TCF return end
+    local Anim = TS:Create(Root, TweenInfo.new(Dist / GLOBAL_SPEED, Enum.EasingStyle.Linear), {CFrame = TCF})
+    Anim:Play(); Anim.Completed:Wait()
+end
+
+getgenv().TeleportToIsland = function(name)
+    local Sea = GetCurrentSea()
+    local Target = getgenv().IslandList[Sea][name]
+    if Target then pcall(Tween, Target) end
 end
 
 local function CheckQuestActive()
-    local questGui = plr.PlayerGui.Main:FindFirstChild("Quest")
-    return questGui and questGui.Visible
+    local qG = plr.PlayerGui.Main:FindFirstChild("Quest")
+    return qG and qG.Visible
 end
 
 local function AutoQuestLogic()
     if CheckQuestActive() then return end
-    local MyLevel = plr.Data.Level.Value
-    local Sea = GetCurrentSea()
-    local BestQuest = nil
-    for _, v in ipairs(QuestList[Sea]) do
-        if MyLevel >= v.Level then
-            BestQuest = v
-        end
+    local Sea, MyLevel = GetCurrentSea(), plr.Data.Level.Value
+    local Best = nil
+    for _, v in ipairs(getgenv().QuestList[Sea]) do
+        if MyLevel >= v.Level then Best = v end
     end
-    if BestQuest then
-        local InitialPos = plr.Character.HumanoidRootPart.CFrame
-        Tween(BestQuest.NPCPos)
+    if Best then
+        local initPos = GetRoot().CFrame
+        pcall(Tween, Best.NPCPos)
         task.wait(0.5)
-        pcall(function()
-            ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", BestQuest.QuestName, BestQuest.LevelQuest)
-        end)
+        pcall(function() RS.Remotes.CommF_:InvokeServer("StartQuest", Best.QuestName, Best.LevelQuest) end)
         task.wait(0.5)
-        Tween(InitialPos)
+        pcall(Tween, initPos)
     end
 end
 
 task.spawn(function()
     while task.wait(1) do
-        if getgenv().AutoQuest == true then
-            pcall(AutoQuestLogic)
-        end
+        if getgenv().AutoQuest then pcall(AutoQuestLogic) end
     end
 end)
