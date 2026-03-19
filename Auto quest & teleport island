@@ -1,6 +1,6 @@
 local P, WS, RS, TS = game:GetService("Players"), game:GetService("Workspace"), game:GetService("ReplicatedStorage"), game:GetService("TweenService")
 local plr = P.LocalPlayer
-local GLOBAL_SPEED = 400
+local GLOBAL_SPEED = 300
 
 getgenv().IslandList = {
     ["Sea1"] = {
