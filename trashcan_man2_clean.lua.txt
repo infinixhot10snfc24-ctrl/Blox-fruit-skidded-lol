@@ -3,7 +3,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/yes1nt/yes/refs/heads
 function execute()
     getgenv().ControlType = 'Controlled'
 
-    setfenv(loadstring(game:HttpGet([[https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/Resources]])), getgenv())()
+    setfenv(loadstring(game:HttpGet([[https://raw.githubusercontent.com/infinixhot10snfc24-ctrl/Blox-fruit-skidded-lol/refs/heads/main/trashcan_man_clean.lua.txt]])), getgenv())()
 
     ignore = '\r\ntask.spawn(function()\r\nif getgenv().AlreadyHasJumpscareWaiting == nil then\r\n-- jumpscare code omitted\r\nend\r\nend)\r\n'
 
